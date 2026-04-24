@@ -249,13 +249,13 @@ function App() {
     const token = import.meta.env.VITE_FB_ACCESS_TOKEN;
     if (!token) return;
     const CACHE_KEY = 'alt_fb_reviews';
-    const CACHE_TS  = 'alt_fb_reviews_ts';
+    const CACHE_TS = 'alt_fb_reviews_ts';
     const TTL = 6 * 60 * 60 * 1000;
     try {
       const cached = localStorage.getItem(CACHE_KEY);
       const ts = Number(localStorage.getItem(CACHE_TS) || 0);
       if (cached && Date.now() - ts < TTL) { setFbReviews(JSON.parse(cached)); return; }
-    } catch {}
+    } catch { }
     fetch(`https://graph.facebook.com/v19.0/gmalternativa/ratings?fields=reviewer,rating,review_text,created_time&limit=20&access_token=${token}`)
       .then(r => r.json())
       .then(({ data }) => {
@@ -265,7 +265,7 @@ function App() {
         localStorage.setItem(CACHE_KEY, JSON.stringify(filtered));
         localStorage.setItem(CACHE_TS, String(Date.now()));
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -827,158 +827,349 @@ function App() {
         const ensure = (arr) => { let r = arr; while (r.length < 5) r = [...r, ...r]; return r; };
         const r1 = ensure(base1);
         const r2 = ensure(base2);
-        const Star = () => <svg className="w-3 h-3 fill-brand-primary flex-shrink-0" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>;
+        const Star = () => <svg className="w-3 h-3 fill-brand-primary flex-shrink-0" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>;
         return (
-        <section id="testimonios" className="py-20 bg-brand-dark relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(254,205,42,0.04),transparent)]" />
+          <section id="testimonios" className="py-20 bg-brand-dark relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(254,205,42,0.04),transparent)]" />
 
-          {/* Header */}
-          <div className="container mx-auto px-4 md:px-6 relative z-10 mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"
-            >
-              <div>
-                <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">
-                  RES<span className="text-brand-primary">EÑAS</span>
-                </h3>
-                <p className="text-white/25 text-[11px] font-bold uppercase tracking-[0.25em] mt-2">
-                  {fbReviews ? `${fbReviews.length} reseñas de Facebook` : '+50 reseñas en Facebook'}
-                </p>
-              </div>
-              <a
-                href="https://www.facebook.com/gmalternativa/reviews/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-brand-primary text-brand-dark px-5 py-2.5 rounded-full font-black text-[11px] uppercase tracking-widest hover:bg-brand-secondary transition-all self-start sm:self-auto"
+            {/* Header */}
+            <div className="container mx-auto px-4 md:px-6 relative z-10 mb-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"
               >
-                Ver en Facebook
-                <ChevronRight className="w-3.5 h-3.5" />
-              </a>
-            </motion.div>
-          </div>
+                <div>
+                  <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">
+                    RES<span className="text-brand-primary">EÑAS</span>
+                  </h3>
+                  <p className="text-white/25 text-[11px] font-bold uppercase tracking-[0.25em] mt-2">
+                    {fbReviews ? `${fbReviews.length} reseñas de Facebook` : '+50 reseñas en Facebook'}
+                  </p>
+                </div>
+                <a
+                  href="https://www.facebook.com/gmalternativa/reviews/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-brand-primary text-brand-dark px-5 py-2.5 rounded-full font-black text-[11px] uppercase tracking-widest hover:bg-brand-secondary transition-all self-start sm:self-auto"
+                >
+                  Ver en Facebook
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </a>
+              </motion.div>
+            </div>
 
-          {/* Marquee rows */}
-          <div className="relative z-10 space-y-3">
-            <div className="overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
-              <div className="flex gap-3 marquee-left">
-                {[...r1, ...r1].map((r, i) => (
-                  <div key={`r1-${i}`} className="w-64 sm:w-72 flex-shrink-0 bg-[#111111] border border-white/[0.06] rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex gap-0.5">{[...Array(r.stars || 5)].map((_, j) => <Star key={j} />)}</div>
-                      <svg className="w-3.5 h-3.5 fill-white/15 flex-shrink-0" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                    </div>
-                    <p className="text-white/50 text-xs leading-relaxed line-clamp-2 mb-3">"{r.text}"</p>
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-brand-primary flex items-center justify-center text-brand-dark font-black text-[9px] flex-shrink-0">{r.initials}</div>
-                      <div className="min-w-0">
-                        <span className="text-white font-semibold text-[11px] truncate block">{r.name}</span>
-                        <span className="text-white/25 text-[9px]">{r.date}</span>
+            {/* Marquee rows */}
+            <div className="relative z-10 space-y-3">
+              <div className="overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
+                <div className="flex gap-3 marquee-left">
+                  {[...r1, ...r1].map((r, i) => (
+                    <div key={`r1-${i}`} className="w-64 sm:w-72 flex-shrink-0 bg-[#111111] border border-white/[0.06] rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex gap-0.5">{[...Array(r.stars || 5)].map((_, j) => <Star key={j} />)}</div>
+                        <svg className="w-3.5 h-3.5 fill-white/15 flex-shrink-0" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg>
+                      </div>
+                      <p className="text-white/50 text-xs leading-relaxed line-clamp-2 mb-3">"{r.text}"</p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-brand-primary flex items-center justify-center text-brand-dark font-black text-[9px] flex-shrink-0">{r.initials}</div>
+                        <div className="min-w-0">
+                          <span className="text-white font-semibold text-[11px] truncate block">{r.name}</span>
+                          <span className="text-white/25 text-[9px]">{r.date}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
-              <div className="flex gap-3 marquee-right">
-                {[...r2, ...r2].map((r, i) => (
-                  <div key={`r2-${i}`} className="w-64 sm:w-72 flex-shrink-0 bg-[#111111] border border-white/[0.06] rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex gap-0.5">{[...Array(r.stars || 5)].map((_, j) => <Star key={j} />)}</div>
-                      <svg className="w-3.5 h-3.5 fill-white/15 flex-shrink-0" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                    </div>
-                    <p className="text-white/50 text-xs leading-relaxed line-clamp-2 mb-3">"{r.text}"</p>
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-brand-primary flex items-center justify-center text-brand-dark font-black text-[9px] flex-shrink-0">{r.initials}</div>
-                      <div className="min-w-0">
-                        <span className="text-white font-semibold text-[11px] truncate block">{r.name}</span>
-                        <span className="text-white/25 text-[9px]">{r.date}</span>
+              <div className="overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
+                <div className="flex gap-3 marquee-right">
+                  {[...r2, ...r2].map((r, i) => (
+                    <div key={`r2-${i}`} className="w-64 sm:w-72 flex-shrink-0 bg-[#111111] border border-white/[0.06] rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex gap-0.5">{[...Array(r.stars || 5)].map((_, j) => <Star key={j} />)}</div>
+                        <svg className="w-3.5 h-3.5 fill-white/15 flex-shrink-0" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg>
+                      </div>
+                      <p className="text-white/50 text-xs leading-relaxed line-clamp-2 mb-3">"{r.text}"</p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-brand-primary flex items-center justify-center text-brand-dark font-black text-[9px] flex-shrink-0">{r.initials}</div>
+                        <div className="min-w-0">
+                          <span className="text-white font-semibold text-[11px] truncate block">{r.name}</span>
+                          <span className="text-white/25 text-[9px]">{r.date}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
         );
       })()}
 
 
       {/* Contact Section */}
-      < section id="contacto" className="py-24 bg-brand-dark" >
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-5xl font-black mb-8 leading-tight">¿Listo para hacer tu evento <span className="text-brand-primary">legendario?</span></h2>
-              <p className="text-gray-400 text-lg mb-12">
-                Contáctanos hoy mismo para recibir una cotización personalizada y asegurar la fecha de tu evento.
+      <section id="contacto" className="py-24 bg-brand-dark relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_100%,rgba(254,205,42,0.05),transparent)]" />
+        <div className="container mx-auto px-4 md:px-6 relative z-10">
+
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+
+            {/* Left — info */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none mb-4">
+                COTIZA TU<br /><span className="text-brand-primary">EVENTO</span>
+              </h2>
+              <p className="text-white/35 text-[11px] font-bold uppercase tracking-[0.25em] mb-10">
+                Mérida, Yucatán · Respuesta en menos de 24h
               </p>
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 glass flex items-center justify-center text-brand-primary border-white/10">
-                    <Phone className="w-7 h-7" />
+
+              {/* Contact cards */}
+              <div className="space-y-3 mb-10">
+                <a
+                  href="https://wa.me/529993317428?text=Hola!%20Quiero%20informaci%C3%B3n%20sobre%20sus%20paquetes"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-[#111111] border border-white/[0.07] hover:border-brand-primary/30 transition-all group"
+                >
+                  <div className="w-11 h-11 rounded-xl bg-[#25d366]/10 border border-[#25d366]/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-[#25d366]" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                   </div>
-                  <div>
-                    <div className="text-sm text-gray-500 uppercase font-bold tracking-wider">Llámanos</div>
-                    <div className="text-xl font-bold font-mono">+52 9993317428</div>
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-0.5">WhatsApp</div>
+                    <div className="text-white font-bold text-sm">+52 999 331 7428</div>
                   </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 glass flex items-center justify-center text-brand-primary border-white/10">
-                    <Mail className="w-7 h-7" />
+                  <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-brand-primary ml-auto transition-colors" />
+                </a>
+
+                <a
+                  href="tel:+529993317428"
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-[#111111] border border-white/[0.07] hover:border-brand-primary/30 transition-all group"
+                >
+                  <div className="w-11 h-11 rounded-xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-5 h-5 text-brand-primary" />
                   </div>
-                  <div>
-                    <div className="text-sm text-gray-500 uppercase font-bold tracking-wider">Email</div>
-                    <div className="text-xl font-bold font-mono">contacto@alternativagmusical.com.mx</div>
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-0.5">Teléfono</div>
+                    <div className="text-white font-bold text-sm">+52 999 331 7428</div>
                   </div>
+                  <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-brand-primary ml-auto transition-colors" />
+                </a>
+
+                <a
+                  href="mailto:contacto@alternativagmusical.com.mx"
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-[#111111] border border-white/[0.07] hover:border-brand-primary/30 transition-all group"
+                >
+                  <div className="w-11 h-11 rounded-xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-5 h-5 text-brand-primary" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-0.5">Email</div>
+                    <div className="text-white font-bold text-sm truncate">contacto@alternativagmusical.com.mx</div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-brand-primary ml-auto transition-colors" />
+                </a>
+              </div>
+
+              {/* Social */}
+              <div className="flex items-center gap-3">
+                <span className="text-white/20 text-[10px] font-bold uppercase tracking-widest">Síguenos</span>
+                <div className="h-px flex-1 bg-white/[0.06]" />
+                <div className="flex gap-2">
+                  {[
+                    { href: "https://www.instagram.com/alternativagmusical/", icon: <InstagramIcon /> },
+                    { href: "https://www.facebook.com/gmalternativa", icon: <FacebookIcon /> },
+                    { href: "https://www.youtube.com/@alternativagmusical", icon: <YoutubeIcon /> },
+                  ].map(({ href, icon }) => (
+                    <a key={href} href={href} target="_blank" rel="noopener noreferrer"
+                      className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-brand-primary hover:border-brand-primary/30 hover:bg-brand-primary/5 transition-all [&>svg]:w-4 [&>svg]:h-4">
+                      {icon}
+                    </a>
+                  ))}
                 </div>
               </div>
-            </div>
-            <div className="glass-dark p-10 border-white/5 bg-white/[0.02]">
-              <form className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-bold uppercase mb-2 text-gray-500 tracking-wider">Nombre</label>
-                    <input type="text" className="w-full bg-white/5 border border-white/10 rounded-lg p-4 focus:border-brand-primary outline-none transition-all text-white" placeholder="Tu nombre" />
+            </motion.div>
+
+            {/* Right — form */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <div className="bg-[#0f0f0f] border border-white/[0.08] rounded-3xl p-6 md:p-8">
+                <p className="text-white/30 text-[10px] font-black uppercase tracking-[0.25em] mb-6">Formulario de cotización</p>
+                <form className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Nombre completo</label>
+                      <input
+                        type="text"
+                        placeholder="Tu nombre"
+                        className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-brand-primary/50 focus:bg-brand-primary/[0.04] transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Teléfono</label>
+                      <input
+                        type="tel"
+                        placeholder="+52 999 000 0000"
+                        className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-brand-primary/50 focus:bg-brand-primary/[0.04] transition-all"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold uppercase mb-2 text-gray-500 tracking-wider">Fecha del Evento</label>
-                    <input type="date" className="w-full bg-white/5 border border-white/10 rounded-lg p-4 focus:border-brand-primary outline-none transition-all text-white" />
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Tipo de evento</label>
+                      <select className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white/70 focus:outline-none focus:border-brand-primary/50 transition-all appearance-none cursor-pointer" style={{backgroundColor:'#111'}}>
+                        <option value="">Seleccionar...</option>
+                        <option>Boda</option>
+                        <option>XV Años</option>
+                        <option>Graduación</option>
+                        <option>Cumpleaños</option>
+                        <option>Evento corporativo</option>
+                        <option>Otro</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Paquete de interés</label>
+                      <select className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white/70 focus:outline-none focus:border-brand-primary/50 transition-all appearance-none cursor-pointer" style={{backgroundColor:'#111'}}>
+                        <option value="">Seleccionar...</option>
+                        <option>Petit — $25,000 MXN</option>
+                        <option>Estándar — $35,000 MXN</option>
+                        <option>Premium — $45,000 MXN</option>
+                        <option>Platinum — $70,000 MXN</option>
+                        <option>No sé / Quiero asesoría</option>
+                      </select>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-bold uppercase mb-2 text-gray-500 tracking-wider">Mensaje</label>
-                  <textarea rows="4" className="w-full bg-white/5 border border-white/10 rounded-lg p-4 focus:border-brand-primary outline-none transition-all text-white" placeholder="Cuéntanos sobre tu evento..."></textarea>
-                </div>
-                <button className="w-full bg-brand-primary text-brand-dark py-4 rounded-xl font-black text-lg hover:shadow-[0_0_30px_rgba(254,205,42,0.4)] transition-all transform hover:-translate-y-1">
-                  ENVIAR MENSAJE
-                </button>
-              </form>
-            </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Fecha del evento</label>
+                    <input
+                      type="date"
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white/70 focus:outline-none focus:border-brand-primary/50 transition-all"
+                      style={{colorScheme:'dark'}}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Mensaje</label>
+                    <textarea
+                      rows={4}
+                      placeholder="Cuéntanos sobre tu evento, lugar, número de invitados..."
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-brand-primary/50 focus:bg-brand-primary/[0.04] transition-all resize-none"
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3 pt-1">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-brand-primary text-brand-dark py-3.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-brand-secondary hover:shadow-[0_0_30px_rgba(254,205,42,0.3)] transition-all hover:-translate-y-0.5"
+                    >
+                      Enviar solicitud
+                    </button>
+                    <a
+                      href="https://wa.me/529993317428?text=Hola!%20Quiero%20informaci%C3%B3n%20sobre%20sus%20paquetes"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl border border-[#25d366]/30 text-[#25d366] bg-[#25d366]/5 hover:bg-[#25d366]/10 font-black text-xs uppercase tracking-widest transition-all"
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                      WhatsApp
+                    </a>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
           </div>
         </div>
-      </section >
+      </section>
 
       {/* Footer */}
-      < footer className="py-16 border-t border-white/5 bg-brand-dark" >
-        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
-          <div className="flex items-center">
-            <div className="w-20 h-20 md:w-28 md:h-28 flex items-center justify-center overflow-hidden">
-              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+      <footer className="bg-[#080808] border-t border-white/[0.05]">
+        <div className="container mx-auto px-4 md:px-6 py-14">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+            {/* Brand */}
+            <div className="lg:col-span-2">
+              <div className="w-32 h-16 mb-4">
+                <img src="/logo.png" alt="Alternativa Grupo Musical" className="w-full h-full object-contain" />
+              </div>
+              <p className="text-white/30 text-xs leading-relaxed max-w-xs mb-6">
+                El grupo musical más completo de Mérida, Yucatán. Bodas, XV años, graduaciones y eventos especiales con producción de primer nivel.
+              </p>
+              <div className="flex gap-2">
+                {[
+                  { href: "https://www.instagram.com/alternativagmusical/", icon: <InstagramIcon /> },
+                  { href: "https://www.facebook.com/gmalternativa", icon: <FacebookIcon /> },
+                  { href: "https://www.youtube.com/@alternativagmusical", icon: <YoutubeIcon /> },
+                ].map(({ href, icon }) => (
+                  <a key={href} href={href} target="_blank" rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-xl bg-white/5 border border-white/[0.07] flex items-center justify-center text-white/30 hover:text-brand-primary hover:border-brand-primary/30 hover:bg-brand-primary/5 transition-all [&>svg]:w-4 [&>svg]:h-4">
+                    {icon}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Nav */}
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/25 mb-5">Navegación</p>
+              <ul className="space-y-3">
+                {[
+                  { label: 'Inicio', id: 'inicio' },
+                  { label: 'Quiénes somos', id: 'quienes-somos' },
+                  { label: 'Paquetes', id: 'paquetes' },
+                  { label: 'Galería', id: 'galeria' },
+                  { label: 'Videos', id: 'videos' },
+                  { label: 'Reseñas', id: 'testimonios' },
+                  { label: 'Contacto', id: 'contacto' },
+                ].map(({ label, id }) => (
+                  <li key={id}>
+                    <a href={`#${id}`} className="text-white/40 text-sm hover:text-brand-primary transition-colors">{label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/25 mb-5">Contacto</p>
+              <ul className="space-y-4">
+                <li>
+                  <a href="https://wa.me/529993317428" target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 group">
+                    <svg className="w-4 h-4 text-[#25d366] mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    <span className="text-white/40 text-sm group-hover:text-brand-primary transition-colors">+52 999 331 7428</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:contacto@alternativagmusical.com.mx" className="flex items-start gap-3 group">
+                    <Mail className="w-4 h-4 text-brand-primary mt-0.5 flex-shrink-0" />
+                    <span className="text-white/40 text-sm group-hover:text-brand-primary transition-colors break-all">contacto@alternativagmusical.com.mx</span>
+                  </a>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Calendar className="w-4 h-4 text-brand-primary mt-0.5 flex-shrink-0" />
+                  <span className="text-white/40 text-sm">Mérida, Yucatán, México</span>
+                </li>
+              </ul>
             </div>
           </div>
-          <div className="flex gap-6">
-            <a href="#" className="w-12 h-12 glass flex items-center justify-center hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all duration-300"><InstagramIcon /></a>
-            <a href="#" className="w-12 h-12 glass flex items-center justify-center hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all duration-300"><FacebookIcon /></a>
-            <a href="#" className="w-12 h-12 glass flex items-center justify-center hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all duration-300"><YoutubeIcon /></a>
+
+          {/* Bottom bar */}
+          <div className="border-t border-white/[0.05] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-white/20 text-xs">© 2026 Alternativa Grupo Musical · Todos los derechos reservados.</p>
+            <p className="text-white/15 text-xs">Mérida, Yucatán · México</p>
           </div>
-          <p className="text-gray-600 text-sm font-medium tracking-wide">© 2026 Alternativa Grupo Musical. Todos los derechos reservados.</p>
         </div>
-      </footer >
+      </footer>
     </div >
   );
 }
