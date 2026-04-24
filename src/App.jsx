@@ -47,116 +47,76 @@ const ServiceCard = ({ icon: Icon, title, description }) => (
 
 const PackageCard = ({ image, name, price, tagline, ideal, description, features, isRecommended }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const mxS = useSpring(mx, { stiffness: 150, damping: 20 });
-  const myS = useSpring(my, { stiffness: 150, damping: 20 });
-  const rotateX = useTransform(myS, [-0.5, 0.5], ["5deg", "-5deg"]);
-  const rotateY = useTransform(mxS, [-0.5, 0.5], ["-5deg", "5deg"]);
-
-  const handleMouseMove = (e) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    mx.set((e.clientX - r.left) / r.width - 0.5);
-    my.set((e.clientY - r.top) / r.height - 0.5);
-  };
-  const handleMouseLeave = () => { mx.set(0); my.set(0); };
-
   const priceNum = price.replace(' MXN', '');
-  const checkFeatures = features.slice(0, 5);
 
   return (
     <>
       <motion.div
         layoutId={`card-${name}`}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className="relative cursor-pointer"
         onClick={() => setIsOpen(true)}
+        whileHover={{ y: -4 }}
+        transition={{ duration: 0.2 }}
+        className="relative cursor-pointer flex flex-col h-full"
       >
-        {/* Outer glow for recommended */}
-        {isRecommended && (
-          <div className="absolute -inset-px rounded-[2rem] bg-brand-primary/20 blur-xl pointer-events-none" />
-        )}
+        {/* Top accent line */}
+        <div className={`h-[2px] w-full rounded-t-2xl ${isRecommended ? 'bg-brand-primary' : 'bg-white/[0.06]'}`} />
 
-        <div className={`relative rounded-[2rem] overflow-hidden flex flex-col border transition-all duration-300 group
+        <div className={`flex flex-col flex-1 rounded-b-2xl border-x border-b px-6 py-7 transition-colors duration-200
           ${isRecommended
-            ? 'bg-[#16160a] border-brand-primary/50 shadow-[0_0_40px_rgba(254,205,42,0.12)]'
-            : 'bg-[#0f0f0f] border-white/[0.07] hover:border-white/[0.14]'
+            ? 'bg-[#111108] border-brand-primary/20'
+            : 'bg-[#0c0c0c] border-white/[0.07] hover:border-white/[0.13]'
           }`}
-          style={{ transform: "translateZ(0)" }}
         >
-          {/* Most popular badge */}
+          {/* Badge */}
           {isRecommended && (
-            <div className="flex justify-center pt-4 pb-0">
-              <span className="bg-brand-primary text-brand-dark text-[10px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full">
-                Más Popular
-              </span>
-            </div>
+            <span className="self-start text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary bg-brand-primary/10 px-3 py-1 rounded-full mb-4">
+              Más popular
+            </span>
           )}
 
-          {/* Image header */}
-          <div className={`relative overflow-hidden ${isRecommended ? 'h-28 mt-3' : 'h-32'}`}>
-            <img
-              src={image}
-              alt={name}
-              className="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700"
-            />
-            <div className={`absolute inset-0 bg-gradient-to-b ${isRecommended ? 'from-transparent to-[#16160a]' : 'from-transparent to-[#0f0f0f]'}`} />
-            <div className="absolute bottom-3 left-4">
-              <span className="text-brand-primary text-[10px] font-black uppercase tracking-[0.25em]">{tagline}</span>
+          {/* Name + tagline */}
+          <p className="text-white/30 text-[11px] font-bold uppercase tracking-widest mb-1">{tagline}</p>
+          <h4 className="text-2xl font-black tracking-tight text-white mb-6">{name}</h4>
+
+          {/* Price */}
+          <div className="mb-6">
+            <div className="flex items-baseline gap-1.5">
+              <span className={`text-4xl font-black leading-none ${isRecommended ? 'text-brand-primary' : 'text-white'}`}>
+                {priceNum}
+              </span>
+              <span className="text-white/30 text-sm font-semibold">MXN</span>
             </div>
+            <p className="text-white/20 text-[10px] mt-1">precio base · IVA no incluido</p>
           </div>
 
-          {/* Body */}
-          <div className="px-6 pb-6 pt-4 flex flex-col flex-1">
-            {/* Name */}
-            <h4 className={`text-3xl font-black tracking-tighter leading-none mb-4 transition-colors duration-300 ${isRecommended ? 'text-brand-primary' : 'text-white group-hover:text-brand-primary'}`}>
-              {name}
-            </h4>
+          {/* Divider */}
+          <div className="h-px bg-white/[0.06] mb-6" />
 
-            {/* Price block */}
-            <div className={`rounded-2xl p-4 mb-5 ${isRecommended ? 'bg-brand-primary/10 border border-brand-primary/20' : 'bg-white/[0.04] border border-white/[0.07]'}`}>
-              <div className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-1">Precio desde</div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-black text-white leading-none">{priceNum}</span>
-                <span className="text-sm font-bold text-white/40">MXN</span>
-              </div>
-            </div>
+          {/* Features */}
+          <ul className="space-y-3 flex-1 mb-8">
+            {features.map((f, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <svg
+                  className={`w-4 h-4 flex-shrink-0 mt-0.5 ${isRecommended ? 'text-brand-primary' : 'text-white/30'}`}
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-white/55 text-[13px] leading-snug">{f.value}</span>
+              </li>
+            ))}
+          </ul>
 
-            {/* Feature checklist */}
-            <ul className="space-y-2.5 mb-5 flex-1">
-              {checkFeatures.map((f, i) => (
-                <li key={i} className="flex items-start gap-2.5">
-                  <span className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${isRecommended ? 'bg-brand-primary/20 border border-brand-primary/40' : 'bg-white/5 border border-white/15'}`}>
-                    <svg className={`w-2.5 h-2.5 ${isRecommended ? 'text-brand-primary' : 'text-white/50'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </span>
-                  <span className="text-white/60 text-xs leading-relaxed">{f.value}</span>
-                </li>
-              ))}
-              {features.length > 5 && (
-                <li className="text-brand-primary text-[11px] font-bold pl-6.5">
-                  +{features.length - 5} beneficios más →
-                </li>
-              )}
-            </ul>
-
-            {/* Divider */}
-            <div className={`h-px mb-5 ${isRecommended ? 'bg-brand-primary/15' : 'bg-white/[0.06]'}`} />
-
-            {/* CTA */}
-            <button
-              className={`w-full py-3.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-300
-                ${isRecommended
-                  ? 'bg-brand-primary text-brand-dark hover:bg-brand-secondary shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/30'
-                  : 'bg-white/5 text-white border border-white/10 hover:bg-brand-primary hover:text-brand-dark hover:border-brand-primary'
-                }`}
-            >
-              Ver detalles completos
-            </button>
-          </div>
+          {/* CTA */}
+          <button
+            className={`w-full py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all duration-200
+              ${isRecommended
+                ? 'bg-brand-primary text-brand-dark hover:brightness-110'
+                : 'border border-white/[0.1] text-white/60 hover:border-brand-primary/40 hover:text-brand-primary'
+              }`}
+          >
+            Ver detalles
+          </button>
         </div>
       </motion.div>
 
@@ -563,8 +523,8 @@ function App() {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h3 className="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tighter leading-none">PAQUETES <span className="text-brand-primary">& PRECIOS</span></h3>
-            <p className="text-white/35 text-sm font-bold uppercase tracking-[0.25em] mt-2">Elige el que mejor se adapte a tu celebración</p>
+            <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">PAQUETES <span className="text-brand-primary">& PRECIOS</span></h3>
+            <p className="text-white/25 text-[11px] font-bold uppercase tracking-[0.25em] mt-3">Elige el que mejor se adapte a tu celebración</p>
           </motion.div>
 
           <motion.div
@@ -573,14 +533,9 @@ function App() {
             viewport={{ once: true }}
             variants={{
               hidden: { opacity: 0 },
-              show: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.15
-                }
-              }
+              show: { opacity: 1, transition: { staggerChildren: 0.1 } }
             }}
-            className="grid sm:grid-cols-2 xl:grid-cols-4 gap-5"
+            className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch"
           >
             <motion.div variants={{ hidden: { opacity: 0, y: 50 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}>
               <PackageCard
@@ -820,7 +775,7 @@ function App() {
         ];
         const reviews = fbReviews
           ? fbReviews.map(r => ({ name: r.reviewer?.name || 'Cliente', initials: toInitials(r.reviewer?.name), text: r.review_text, date: relDate(r.created_time), stars: r.rating }))
-          : FALLBACK;
+          : FALLBACK
         const half = Math.ceil(reviews.length / 2);
         const base1 = reviews.slice(0, half);
         const base2 = reviews.slice(half).length ? reviews.slice(half) : reviews.slice(0, half).reverse();
@@ -938,7 +893,7 @@ function App() {
                   className="flex items-center gap-4 p-4 rounded-2xl bg-[#111111] border border-white/[0.07] hover:border-brand-primary/30 transition-all group"
                 >
                   <div className="w-11 h-11 rounded-xl bg-[#25d366]/10 border border-[#25d366]/20 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-[#25d366]" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    <svg className="w-5 h-5 text-[#25d366]" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
                   </div>
                   <div className="min-w-0">
                     <div className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-0.5">WhatsApp</div>
@@ -1027,7 +982,7 @@ function App() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Tipo de evento</label>
-                      <select className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white/70 focus:outline-none focus:border-brand-primary/50 transition-all appearance-none cursor-pointer" style={{backgroundColor:'#111'}}>
+                      <select className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white/70 focus:outline-none focus:border-brand-primary/50 transition-all appearance-none cursor-pointer" style={{ backgroundColor: '#111' }}>
                         <option value="">Seleccionar...</option>
                         <option>Boda</option>
                         <option>XV Años</option>
@@ -1039,7 +994,7 @@ function App() {
                     </div>
                     <div>
                       <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Paquete de interés</label>
-                      <select className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white/70 focus:outline-none focus:border-brand-primary/50 transition-all appearance-none cursor-pointer" style={{backgroundColor:'#111'}}>
+                      <select className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white/70 focus:outline-none focus:border-brand-primary/50 transition-all appearance-none cursor-pointer" style={{ backgroundColor: '#111' }}>
                         <option value="">Seleccionar...</option>
                         <option>Petit — $25,000 MXN</option>
                         <option>Estándar — $35,000 MXN</option>
@@ -1055,7 +1010,7 @@ function App() {
                     <input
                       type="date"
                       className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white/70 focus:outline-none focus:border-brand-primary/50 transition-all"
-                      style={{colorScheme:'dark'}}
+                      style={{ colorScheme: 'dark' }}
                     />
                   </div>
 
@@ -1081,7 +1036,7 @@ function App() {
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl border border-[#25d366]/30 text-[#25d366] bg-[#25d366]/5 hover:bg-[#25d366]/10 font-black text-xs uppercase tracking-widest transition-all"
                     >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
                       WhatsApp
                     </a>
                   </div>
@@ -1145,7 +1100,7 @@ function App() {
               <ul className="space-y-4">
                 <li>
                   <a href="https://wa.me/529993317428" target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 group">
-                    <svg className="w-4 h-4 text-[#25d366] mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    <svg className="w-4 h-4 text-[#25d366] mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
                     <span className="text-white/40 text-sm group-hover:text-brand-primary transition-colors">+52 999 331 7428</span>
                   </a>
                 </li>
